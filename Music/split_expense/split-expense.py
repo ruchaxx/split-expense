@@ -2,7 +2,6 @@ group_name = input("Enter name of group ")
 num_of_mem = int(input("Enter total number of members "))
 members = []
 
-
 list_of_expense = []
 
 num = 0
