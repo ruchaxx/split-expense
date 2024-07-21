@@ -1,46 +1,56 @@
-group_name = input("Enter name of group ")
-num_of_mem = int(input("Enter total number of members "))
-members = []
+import json
 
+def read_file():
+    read_file_list = []
+    with open('expense-data.json',mode='r') as file:
+        for line in file:
+            data = json.loads(line.strip())
+            read_file_list.append(data)
+    return read_file_list
 
-list_of_expense = []
+data_store = input("Do you want to use existing data(yes/no) ")
 
-num = 0
+if data_store == "yes":
+     list_of_expense = read_file()
+     num_of_mem = int(len(list_of_expense))
+elif data_store == "no":
+    group_name = input("Enter name of group ")
+    num_of_mem = int(input("Enter total number of members "))
+    members = []
+    list_of_expense = []
+    num = 0
+    while num < num_of_mem:
+        name = input("Enter menbers name " )
+        members.append(name)
+        num = num + 1
 
-while num < num_of_mem:
-    name = input("Enter menbers name " )
-    members.append(name)
-    num = num + 1
-
-for people in members:
-    expense = {"name": "","total_expense": 0,"payers":[]}
-    expense['name'] = people
-    list_of_expense.append(expense)
-
-for mem in list_of_expense:
     for people in members:
-        if mem['name'] == people:
-            pass
-        else:
-            pay = {'name': '', 'money': 0}
-            pay['name'] = people
-            mem['payers'].append(pay)
+        expense = {"name": "","total_expense": 0,"payers":[]}
+        expense['name'] = people
+        list_of_expense.append(expense)
 
-print("group name ",group_name)
-print("num of mem ",num_of_mem)
+    for mem in list_of_expense:
+        for people in members:
+            if mem['name'] == people:
+                pass
+            else:
+                pay = {'name': '', 'money': 0}
+                pay['name'] = people
+                mem['payers'].append(pay)
 
-print("list of members ",members)
+    print("group name ",group_name)
+    print("num of mem ",num_of_mem)
+
+    print("list of members ",members)
+
+
 #print("list_of_expense ",list_of_expense)
 
-def calculate_expense(who_paid,how_much):
-    for people in list_of_expense:
-            if who_paid in people.values():
-                how_much = how_much + int(people['total_expense'])
-                people['total_expense'] = how_much
-                individual_expense = people['total_expense']/num_of_mem
-                for pay in people['payers']:
-                    pay['money'] = individual_expense
-                break
+def calculate_expense():
+    for mem in list_of_expense:
+        individual_expense = mem['total_expense']/num_of_mem
+        for pay in mem['payers']:
+            pay['money'] = individual_expense
 
     #print("final list ",list_of_expense)
 
@@ -83,17 +93,30 @@ def show_expense():
 
 total_expense = 0
 
+def save_file():
+    with open('expense-data.json',mode='w') as file:
+        for people in list_of_expense:
+            json.dump(people,file)
+            file.write("\n")
+
+
 while True:
-    choice = input("Select one 1.Show expenses  2.Enter expense ")
+    choice = input("Select one 1.Show expenses  2.Enter expense  3.Save data  ")
     print("choise is ",choice)
     if choice == '2':
         who_paid = input("who paid? ")
         how_much = int(input("how much money was paid "))
+        for people in list_of_expense:
+            if who_paid in people.values():
+                how_much = how_much + int(people['total_expense'])
+                people['total_expense'] = how_much
+                break
         #print("list ",list_of_expense)
-        calculate_expense(who_paid,how_much)
+        calculate_expense()
         optimise_pay()
 
     elif choice == '1':
         show_expense()
-        #print("expense list ",final_expence)
+    elif choice == '3':
+        save_file()
 
